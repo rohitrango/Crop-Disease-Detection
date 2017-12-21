@@ -71,12 +71,13 @@ def alexnet(pretrained=False, **kwargs):
         model.load_state_dict(model_zoo.load_url(model_urls['alexnet']))
     return model
 
+# Refer to this: http://www.image-net.org/challenges/LSVRC/2012/supervision.pdf
 if __name__ == "__main__":
     # sample forward
     is_cuda = torch.cuda.is_available()    
     net = alexnet(True)
     finetune = MyNet()
-    inp = Variable(torch.rand(5, 3, 227, 227))
+    inp = Variable(torch.rand(5, 3, 224, 224))
     if is_cuda:
         finetune = finetune.cuda()
         net = net.cuda()
