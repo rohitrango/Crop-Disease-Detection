@@ -50,6 +50,8 @@ class AlexNet(nn.Module):
         return x
 
 # We need to finetune this network, and add more layers
+# The no of neurons in the final layer is 38, which is the no of crop-disease pairs
+
 class MyNet(nn.Module):
 
     def __init__(self, num_classes=38):
