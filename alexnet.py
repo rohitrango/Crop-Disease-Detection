@@ -149,3 +149,6 @@ if __name__ == "__main__":
 
 	outputs = net(Variable(images))
 	print(outputs)
+
+	val,ind = torch.max(outputs,1)
+	print(val,ind)
