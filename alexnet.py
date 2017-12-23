@@ -79,18 +79,18 @@ def alexnet(pretrained=False, **kwargs):
 # Refer to this: http://www.image-net.org/challenges/LSVRC/2012/supervision.pdf
 if __name__ == "__main__":
 	# sample forward
-	# is_cuda = torch.cuda.is_available()    
-	# net = alexnet(True)
-	# finetune = MyNet()
-	# inp = Variable(torch.rand(5, 3, 224, 224))
-	# if is_cuda:
-	# 	finetune = finetune.cuda()
-	# 	net = net.cuda()
-	# 	inp = inp.cuda()
+	is_cuda = torch.cuda.is_available()    
+	net = alexnet(True)
+	finetune = MyNet()
+	inp = Variable(torch.rand(5, 3, 224, 224))
+	if is_cuda:
+		finetune = finetune.cuda()
+		net = net.cuda()
+		inp = inp.cuda()
 
-	# y = net(inp)
-	# y = finetune(y)
-	# print(y.shape)
+	y = net(inp)
+	y = finetune(y)
+	print(y.shape)
 
 	# Data Loading
 	data = ImageFolder(root='../images', transform=ToTensor())
