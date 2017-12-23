@@ -1,10 +1,18 @@
-import torch.nn as nn
 import torch.utils.model_zoo as model_zoo
-from torch.autograd import Variable
-import torch
 from torchvision.datasets import ImageFolder
 from torchvision.transforms import ToTensor
 from torch.utils.data import DataLoader
+import torch
+import torch.nn as nn
+import torch.optim as optim
+from torch.optim import lr_scheduler
+from torch.autograd import Variable
+import numpy as np
+import torchvision
+from torchvision import datasets, models, transforms
+import matplotlib.pyplot as plt
+import time
+import os
 
 __all__ = ['AlexNet', 'alexnet']
 
@@ -48,7 +56,7 @@ class AlexNet(nn.Module):
 
 	def forward(self, x):
 		x = self.features(x)
-		x = x.view(x.size(0), 256 * 6 * 6)
+		x = x.view(-1, 256 * 6 * 6)
 		x = self.classifier(x)
 		return x
 
@@ -88,21 +96,43 @@ if __name__ == "__main__":
 		net = net.cuda()
 		inp = inp.cuda()
 
-	y = net(inp)
-	y = finetune(y)
-	print(y.shape)
+	# y = net(inp)
+	# y = finetune(y)
+	# print(y.shape)
 
+	# Data augmentation and normalization for training
+	# Just normalization for validation
+	data_transforms = {
+		'train': transforms.Compose([
+			transforms.RandomResizedCrop(224),
+			# transforms.RandomHorizontalFlip(),
+			transforms.ToTensor(),
+			transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+		]),
+		'val': transforms.Compose([
+			transforms.Resize(256),
+			transforms.CenterCrop(224),
+			transforms.ToTensor(),
+			transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+		]),
+	}
 
-	# Data Loading
-	data = ImageFolder(root='../images', transform=ToTensor())
-	print(data.classes)
 	
-	loader = DataLoader(data,shuffle=True)
-	# get some random training images
-	dataiter = iter(loader)
+	# Data Loading
+	data_dir = '../'
+	image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
+											  data_transforms[x])
+					  for x in ['train']}
+	dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4,
+												 shuffle=True, num_workers=4)
+				  for x in ['train']}
+	dataset_sizes = {x: len(image_datasets[x]) for x in ['train']}
+	class_names = image_datasets['train'].classes
+
+	dataiter = iter(dataloaders['train'])
+	
 	images, labels = dataiter.next()
 	print(images,labels)
 
-	# for x, y in loader:
-	# 	print(x) # image
-	# 	print(y) # image label
+	outputs = net(Variable(images))
+	print(outputs)
