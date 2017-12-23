@@ -93,7 +93,7 @@ if __name__ == "__main__":
 	# print(y.shape)
 
 	# Data Loading
-	data = ImageFolder(root='train', transform=ToTensor())
+	data = ImageFolder(root='images', transform=ToTensor())
 	print(data.classes)
 	loader = DataLoader(data,shuffle=True)
 	for x, y in loader:
