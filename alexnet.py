@@ -76,7 +76,7 @@ class MyNet(nn.Module):
 
 	def forward(self, x):
 		x = self.fc1(x)
-		return F.softmax(x,dim=-1)
+		return x
 
 def alexnet(pretrained=False, **kwargs):
 	r"""AlexNet model architecture from the
@@ -157,10 +157,10 @@ if __name__ == "__main__":
 	# Cross Entropy Loss
 	criterion = nn.CrossEntropyLoss()
 	# Stochastic Gradient Descent
-	optimizer = optim.SGD(finetune.parameters(), lr=0.001, momentum=0.9)
+	optimizer = optim.SGD(finetune.parameters(), lr=0.0005, momentum=0.9)
 	
 	running_loss = 0.0
-	for epoch in range(1):
+	for epoch in range(2):
 		for i, data in enumerate(dataloader, 0):
 			# get the inputs
 			inputs, labels = data
@@ -178,6 +178,8 @@ if __name__ == "__main__":
 			optimizer.step()
 
 			running_loss += loss
+			
+			# Print the average loss for the last 50 batches
 			if i>0 and i%50 == 0:
 				print(i,running_loss/50)
 				running_loss = 0.0
