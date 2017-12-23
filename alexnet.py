@@ -99,16 +99,19 @@ if __name__ == "__main__":
 	# y = net(inp)
 	# y = finetune(y)
 	# print(y.shape)
-
+	
 	# Data augmentation and normalization for training
-	# Just normalization for validation
+
 	data_transforms = {
+		# Training data transforms
 		'train': transforms.Compose([
 			transforms.RandomResizedCrop(224),
 			# transforms.RandomHorizontalFlip(),
 			transforms.ToTensor(),
 			transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
 		]),
+
+		# Validation Data Transforms, to be needed later for finetuning
 		'val': transforms.Compose([
 			transforms.Resize(256),
 			transforms.CenterCrop(224),
@@ -117,22 +120,32 @@ if __name__ == "__main__":
 		]),
 	}
 
-	
 	# Data Loading
+	# The directory containing the train and the val folders
 	data_dir = '../'
-	image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),
-											  data_transforms[x])
-					  for x in ['train']}
-	dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4,
-												 shuffle=True, num_workers=4)
-				  for x in ['train']}
-	dataset_sizes = {x: len(image_datasets[x]) for x in ['train']}
+	# For now only the train images are being used , can extend the list to include for 'val' later
+
+	# Image datasets with the transforms applied
+	image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),data_transforms[x])
+					  	for x in ['train']}
+
+	# Dataloaders to load data in batches from the datasets
+	dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4,shuffle=True, num_workers=4)
+				  		for x in ['train']}
+	# Dataset Sizes
+	dataset_sizes = {x: len(image_datasets[x]) 
+						for x in ['train']}
+	# Class Names
 	class_names = image_datasets['train'].classes
 
+	# Defining an iterator for the dataloader for train
 	dataiter = iter(dataloaders['train'])
-	
+
+	# Taking a batch of image dataset which are already in tensor form and ready to be fed into the network
 	images, labels = dataiter.next()
-	print(images,labels)
+
+	# print(images)
+	print(labels)
 
 	outputs = net(Variable(images))
 	print(outputs)
