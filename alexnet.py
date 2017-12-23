@@ -96,7 +96,13 @@ if __name__ == "__main__":
 	# Data Loading
 	data = ImageFolder(root='../images', transform=ToTensor())
 	print(data.classes)
+	
 	loader = DataLoader(data,shuffle=True)
-	for x, y in loader:
-		print(x) # image
-		print(y) # image label
+	# get some random training images
+	dataiter = iter(trainloader)
+	images, labels = dataiter.next()
+	print(images,labels)
+
+	# for x, y in loader:
+	# 	print(x) # image
+	# 	print(y) # image label
