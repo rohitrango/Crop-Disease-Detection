@@ -13,6 +13,8 @@ from torchvision import datasets, models, transforms
 import matplotlib.pyplot as plt
 import time
 import os
+import torch.nn.functional as F
+import torch.optim as optim
 
 __all__ = ['AlexNet', 'alexnet']
 
@@ -67,11 +69,14 @@ class MyNet(nn.Module):
 
 	def __init__(self, num_classes=38):
 		super(MyNet, self).__init__()
-		self.fc1 = nn.Linear(1000, 38)
+		self.fc1 = nn.Sequential(
+			nn.ReLU(inplace=True),
+			nn.Linear(1000, 38),
+		)
 
 	def forward(self, x):
 		x = self.fc1(x)
-		return x
+		return F.softmax(x,dim=-1)
 
 def alexnet(pretrained=False, **kwargs):
 	r"""AlexNet model architecture from the
@@ -84,17 +89,24 @@ def alexnet(pretrained=False, **kwargs):
 		model.load_state_dict(model_zoo.load_url(model_urls['alexnet']))
 	return model
 
+
 # Refer to this: http://www.image-net.org/challenges/LSVRC/2012/supervision.pdf
 if __name__ == "__main__":
 	# sample forward
 	is_cuda = torch.cuda.is_available()    
 	net = alexnet(True)
+	
+	# We don't change the already learnt parameters as of now
+	for param in net.parameters():
+		param.requires_grad = False
+
 	finetune = MyNet()
-	inp = Variable(torch.rand(5, 3, 224, 224))
+	# inp = Variable(torch.rand(5, 3, 224, 224))
+
 	if is_cuda:
 		finetune = finetune.cuda()
 		net = net.cuda()
-		inp = inp.cuda()
+		# inp = inp.cuda()
 
 	# y = net(inp)
 	# y = finetune(y)
@@ -127,16 +139,49 @@ if __name__ == "__main__":
 
 	# Image datasets with the transforms applied
 	image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),data_transforms[x])
-					  	for x in ['train']}
+						for x in ['train']}
 
 	# Dataloaders to load data in batches from the datasets
 	dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4,shuffle=True, num_workers=4)
-				  		for x in ['train']}
+						for x in ['train']}
 	# Dataset Sizes
 	dataset_sizes = {x: len(image_datasets[x]) 
 						for x in ['train']}
 	# Class Names
 	class_names = image_datasets['train'].classes
+
+	# Dataloder for the training set
+	dataloader = dataloaders['train']
+
+	# Training Code Incomplete as of now
+	# Cross Entropy Loss
+	criterion = nn.CrossEntropyLoss()
+	# Stochastic Gradient Descent
+	optimizer = optim.SGD(finetune.parameters(), lr=0.001, momentum=0.9)
+	
+	running_loss = 0.0
+	for epoch in range(1):
+		for i, data in enumerate(dataloader, 0):
+			# get the inputs
+			inputs, labels = data
+
+			# wrap them in Variable
+			inputs, labels = Variable(inputs), Variable(labels)
+
+			# zero the parameter gradients
+			optimizer.zero_grad()
+
+			# forward + backward + optimize
+			outputs = finetune(net(inputs))
+			loss = criterion(outputs, labels)
+			loss.backward()
+			optimizer.step()
+
+			running_loss += loss
+			if i>0 and i%50 == 0:
+				print(i,running_loss/50)
+				running_loss = 0.0
+
 
 	# Defining an iterator for the dataloader for train
 	dataiter = iter(dataloaders['train'])
@@ -147,7 +192,7 @@ if __name__ == "__main__":
 	# print(images)
 	print(labels)
 
-	outputs = net(Variable(images))
+	outputs = finetune(net(Variable(images)))
 	print(outputs)
 
 	val,ind = torch.max(outputs,1)
