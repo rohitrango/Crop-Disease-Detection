@@ -99,7 +99,7 @@ if __name__ == "__main__":
 	
 	loader = DataLoader(data,shuffle=True)
 	# get some random training images
-	dataiter = iter(trainloader)
+	dataiter = iter(loader)
 	images, labels = dataiter.next()
 	print(images,labels)
 
