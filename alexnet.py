@@ -15,6 +15,7 @@ import time
 import os
 import torch.nn.functional as F
 import torch.optim as optim
+EPOCHS = 10000
 
 __all__ = ['AlexNet', 'alexnet']
 
@@ -64,7 +65,6 @@ class AlexNet(nn.Module):
 
 # We need to finetune this network, and add more layers
 # The no of neurons in the final layer is 38, which is the no of crop-disease pairs
-
 class MyNet(nn.Module):
 
 	def __init__(self, num_classes=38):
@@ -86,87 +86,70 @@ def alexnet(pretrained=False, **kwargs):
 	"""
 	model = AlexNet(**kwargs)
 	if pretrained:
-		model.load_state_dict(model_zoo.load_url(model_urls['alexnet']))
+		model.load_state_dict(torch.load("models/alexnet.pt"))
 	return model
 
 
 # Refer to this: http://www.image-net.org/challenges/LSVRC/2012/supervision.pdf
 if __name__ == "__main__":
 	# sample forward
-	is_cuda = torch.cuda.is_available()    
+	is_cuda = torch.cuda.is_available()	
 	net = alexnet(True)
-	
 	# We don't change the already learnt parameters as of now
-	for param in net.parameters():
+	# only let the last layer be allowed
+	# There are 8 trainable layers, and each layer contains 2 params
+	for param in list(net.parameters())[:-2]:
 		param.requires_grad = False
 
 	finetune = MyNet()
-	# inp = Variable(torch.rand(5, 3, 224, 224))
 
 	if is_cuda:
 		finetune = finetune.cuda()
 		net = net.cuda()
-		# inp = inp.cuda()
-
-	# y = net(inp)
-	# y = finetune(y)
-	# print(y.shape)
 	
 	# Data augmentation and normalization for training
 
 	data_transforms = {
 		# Training data transforms
 		'train': transforms.Compose([
-			transforms.RandomResizedCrop(224),
-			# transforms.RandomHorizontalFlip(),
-			transforms.ToTensor(),
-			transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
+				transforms.RandomSizedCrop(224),
+				transforms.RandomHorizontalFlip(),
+				transforms.ToTensor(),
+				transforms.Normalize(mean=[0.485, 0.456, 0.406],
+									 std=[0.229, 0.224, 0.225])
 		]),
 
 		# Validation Data Transforms, to be needed later for finetuning
 		'val': transforms.Compose([
-			transforms.Resize(256),
-			transforms.CenterCrop(224),
-			transforms.ToTensor(),
-			transforms.Normalize([0.485, 0.456, 0.406], [0.229, 0.224, 0.225])
-		]),
+				transforms.CenterCrop(224),
+				transforms.ToTensor(),
+				transforms.Normalize(mean=[0.485, 0.456, 0.406],
+									 std=[0.229, 0.224, 0.225])
+		])
 	}
-
-	# Data Loading
-	# The directory containing the train and the val folders
-	data_dir = '../'
-	# For now only the train images are being used , can extend the list to include for 'val' later
-
-	# Image datasets with the transforms applied
-	image_datasets = {x: datasets.ImageFolder(os.path.join(data_dir, x),data_transforms[x])
-						for x in ['train']}
-
-	# Dataloaders to load data in batches from the datasets
-	dataloaders = {x: torch.utils.data.DataLoader(image_datasets[x], batch_size=4,shuffle=True, num_workers=4)
-						for x in ['train']}
-	# Dataset Sizes
-	dataset_sizes = {x: len(image_datasets[x]) 
-						for x in ['train']}
-	# Class Names
-	class_names = image_datasets['train'].classes
-
-	# Dataloder for the training set
-	dataloader = dataloaders['train']
 
 	# Training Code Incomplete as of now
 	# Cross Entropy Loss
 	criterion = nn.CrossEntropyLoss()
 	# Stochastic Gradient Descent
-	optimizer = optim.SGD(finetune.parameters(), lr=0.0005, momentum=0.9)
+
+	# https://discuss.pytorch.org/t/how-to-train-several-network-at-the-same-time/4920/6
+	parameters = set(finetune.parameters()) | set(net.classifier[-1].parameters())
+	optimizer = optim.SGD(parameters, lr=0.005, momentum=0.9)
+
+	# Train dataloaders
+	train_dataset = datasets.ImageFolder(root='train', transform=data_transforms['train'])
+	dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=4)
 	
+	losses = []
 	running_loss = 0.0
-	for epoch in range(2):
+	for epoch in range(EPOCHS):
 		for i, data in enumerate(dataloader, 0):
 			# get the inputs
 			inputs, labels = data
 
 			# wrap them in Variable
-			inputs, labels = Variable(inputs), Variable(labels)
+			inputs, labels = Variable(inputs).cuda(), Variable(labels).cuda()
 
 			# zero the parameter gradients
 			optimizer.zero_grad()
@@ -180,22 +163,22 @@ if __name__ == "__main__":
 			running_loss += loss
 			
 			# Print the average loss for the last 50 batches
-			if i>0 and i%50 == 0:
-				print(i,running_loss/50)
+			if i%50 == 0 and i>0:
+				print("Epoch: %d, i = %d, Running loss: %f"%(epoch, i, running_loss.data[0]/50))
+				losses.append(running_loss.data[0])
 				running_loss = 0.0
 
-
 	# Defining an iterator for the dataloader for train
-	dataiter = iter(dataloaders['train'])
+	# dataiter = iter(dataloaders['train'])
 
 	# Taking a batch of image dataset which are already in tensor form and ready to be fed into the network
-	images, labels = dataiter.next()
+	# images, labels = dataiter.next()
 
 	# print(images)
-	print(labels)
+	# print(labels)
 
-	outputs = finetune(net(Variable(images)))
-	print(outputs)
+	# outputs = finetune(net(Variable(images)))
+	# print(outputs)
 
-	val,ind = torch.max(outputs,1)
-	print(val,ind)
+	# val,ind = torch.max(outputs,1)
+	# print(val,ind)

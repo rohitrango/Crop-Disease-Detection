@@ -1,2 +1,5 @@
 *.pyc
 images/*
+test/*
+train/*
+models/*
