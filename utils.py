@@ -4,6 +4,8 @@ import json
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils
 from skimage import io
+import torch
+import numpy as np
 
 # Divides the images into training/testing files
 def divide_training_testing(training_ratio=.8, image_dir="images"):
@@ -30,8 +32,8 @@ def divide_training_testing(training_ratio=.8, image_dir="images"):
 def generate_labels_mapping(filename="labels.json"):
 	with open(filename) as f:
 		labels = json.loads(f.read())
-	labels_to_num = dict([(i, v) for i, v in enumerate(labels)])
-	num_to_labels = dict([(v, i) for i, v in enumerate(labels)])
+	labels_to_num = { v: i for i, v in enumerate(labels)}
+	num_to_labels = { i: v for i, v in enumerate(labels)}
 	return labels_to_num, num_to_labels
 
 # Class for custom dataset
@@ -41,6 +43,8 @@ class PlantVillageDataset(Dataset):
 		self.image_dir = image_dir
 		self.is_training = is_training
 		self.image_list = []
+		
+		# generate label mapping
 		l, r = generate_labels_mapping()
 		self.labels_to_num = l
 		self.num_to_labels = r
@@ -68,22 +72,24 @@ class PlantVillageDataset(Dataset):
 			for file in files:
 				self.image_list.append(os.path.join(r, file))
 
-		def __len__(self):
-			return len(self.image_list)
+		# generate plant label mapping
+		self.plants_list = map(lambda x: x.split("/")[1].split("___")[0], self.image_list)
+		self.plants_list = sorted(list(set(self.plants_list)))
 
-		def __getitem__(self, idx):
-			img_path = self.image_list[idx]
-			img = io.imread(img_path)
-			img = self.transform(img)
+		self.plant_labels_to_num = {v: i for i, v in enumerate(self.plants_list)}
+		self.num_to_plant_labels = {i: v for i, v in enumerate(self.plants_list)}
 
-			label = torch.from_numpy(
-				np.array([ self.labels_to_num[img_path.split("/")[1]] ] ))
+	def __len__(self):
+		return len(self.image_list)
 
-			return img, label
+	def __getitem__(self, idx):
+		img_path = self.image_list[idx]
+		img = io.imread(img_path)
+		img = self.transform(img)
 
+		label = torch.from_numpy(
+			np.array([ self.labels_to_num[img_path.split("/")[1]] ] ))
 
+		plant_label = torch.from_numpy(np.array([ self.plant_labels_to_num[img_path.split("/")[1].split("___")[0]] ] ))
 
-
-
-
-
+		return img, plant_label, label
