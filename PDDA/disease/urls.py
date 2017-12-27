@@ -1,7 +1,8 @@
 from django.conf.urls import url
-from . import views
+from .views import *
 
 urlpatterns = [
-    url(r'^$', views.home, name='home'),
-    url(r'^success$', views.success, name='success'),
+    url(r'^$', home, name='home'),
+    url(r'^success$', success, name='success'),
+    url(r'^upload_image_and_get_results/', upload_image_and_get_results, name='upload_image_and_get_results'),
 ]
