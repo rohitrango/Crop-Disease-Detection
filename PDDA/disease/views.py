@@ -34,6 +34,7 @@ def upload_image_and_get_results(request):
 	else:
 		return HttpResponse("<h2>Wrong Page</h2>")
 
+#Change the dummy function to our specific function
 def dummy(image_arr, crop_name):
 	print(image_arr)
 	return {'foo':crop_name}
