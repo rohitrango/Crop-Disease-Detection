@@ -26,6 +26,7 @@ import time
 import os
 import torch.nn.functional as F
 import torch.optim as optim
+import json
 
 
 # Create your views here.
@@ -73,12 +74,10 @@ def dummy(image_arr, crop_name):
 	if is_cuda:
 		finetune = finetune.cuda()
 		net = net.cuda()
-	
-	# Data augmentation and normalization for forward pass
 
+	# Data transformation for forward pass
 	data_transforms = {
 
-		# Data Transforms
 		'val': transforms.Compose([
 				transforms.ToPILImage(),
 				transforms.Resize(256),
@@ -91,12 +90,39 @@ def dummy(image_arr, crop_name):
 
 	input_image = data_transforms['val'](image_tensor)
 
+	# Unsqueeze to convert to a 4D tensor where the first dimension(dim 0) is added and has value 1 as there is only one image in the batch.
+
 	outputs = finetune(net(Variable(input_image.unsqueeze(0))))
-	print outputs
+	# print outputs
 
-	val,ind = torch.max(outputs,1)
+	# Converting the numerical outputs to probabilities
+	soft = nn.Softmax(dim=1)
+	prob = soft(outputs)
+	# print prob
 
-	return {'val':val.data[0],'ind':ind.data[0]}
+
+	# Number of results
+	num_predictions = 5
+
+	val,ind = torch.topk(prob,num_predictions)
+	print val, ind
+
+	json_output = {}
+
+	json_file = open('/home/samarjeet/Desktop/Microsoft Code Fun Do 2018/CodeFunDo/PDDA/disease/labels.json')
+
+	json_data = json_file.read()
+	plant_name = json.loads(json_data)
+
+	for i in range(num_predictions):
+		plant_key = 'plant'+str(i+1)
+		prob_key = 'prob'+str(i+1)
+		json_output[plant_key] = plant_name[ind[0].data[i]]
+		json_output[prob_key] = val[0].data[i]
+
+	json_file.close()
+
+	return json_output
 
 class AlexNet(nn.Module):
 
