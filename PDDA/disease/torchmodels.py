@@ -66,6 +66,33 @@ class MyNet(nn.Module):
 		x = self.fc1(x)
 		return x
 
+class MyNet2(nn.Module):
+
+	def __init__(self, num_classes=38, num_plant_species=14):
+		super(MyNet2, self).__init__()
+
+		self.num_plant_species = num_plant_species
+		self.num_classes = num_classes
+
+		# first sequential to get the value from alexnet
+		self.fc1 = nn.Sequential(
+			nn.ReLU(inplace=True),
+			nn.Linear(1000, 30),
+			nn.ReLU(inplace=True),
+		)
+
+		self.embed = nn.Embedding(self.num_plant_species, 20)
+		self.fc2 = nn.Sequential(
+			nn.Linear(50, self.num_classes)
+		)
+
+	def forward(self, x, label):
+		x = self.fc1(x)
+		embed = self.embed(label)
+		x = torch.cat([x, embed], 1)
+		x = self.fc2(x)
+		return x
+
 def alexnet(pretrained=False, **kwargs):
 	r"""
 	Args:

@@ -102,7 +102,7 @@ def alexnet(pretrained=False, **kwargs):
 	"""
 	model = AlexNet(**kwargs)
 	if pretrained:
-		model.load_state_dict(torch.load("models/alexnet_v2.pt"))
+		model.load_state_dict(torch.load("PDDA/torchmodels/alexnet_v2.pt"))
 	return model
 
 
@@ -123,7 +123,7 @@ if __name__ == "__main__":
 		finetune = finetune.cuda()
 		net = net.cuda()
 	
-	finetune.load_state_dict(torch.load("models/finetune_v2.pt"))
+	finetune.load_state_dict(torch.load("PDDA/torchmodels/finetune_v2.pt"))
 	# Data augmentation and normalization for training
 
 	data_transforms = {
