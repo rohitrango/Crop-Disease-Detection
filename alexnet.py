@@ -86,7 +86,7 @@ def alexnet(pretrained=False, **kwargs):
 	"""
 	model = AlexNet(**kwargs)
 	if pretrained:
-		model.load_state_dict(torch.load("models/alexnet.pt"))
+		model.load_state_dict(torch.load("PDDA/torchmodels/alexnet.pt"))
 	return model
 
 
@@ -102,6 +102,7 @@ if __name__ == "__main__":
 		param.requires_grad = False
 
 	finetune = MyNet()
+	finetune.load_state_dict(torch.load("PDDA/torchmodels/finetune.pt"))
 
 	if is_cuda:
 		finetune = finetune.cuda()
@@ -135,7 +136,7 @@ if __name__ == "__main__":
 
 	# https://discuss.pytorch.org/t/how-to-train-several-network-at-the-same-time/4920/6
 	parameters = set(finetune.parameters()) | set(net.classifier[-1].parameters())
-	optimizer = optim.SGD(parameters, lr=0.005, momentum=0.9)
+	optimizer = optim.SGD(parameters, lr=0.002, momentum=0.1)
 
 	# Train dataloaders
 	train_dataset = datasets.ImageFolder(root='train', transform=data_transforms['train'])
@@ -150,7 +151,6 @@ if __name__ == "__main__":
 
 			# wrap them in Variable
 			inputs, labels = Variable(inputs).cuda(), Variable(labels).cuda()
-
 			# zero the parameter gradients
 			optimizer.zero_grad()
 
@@ -168,17 +168,7 @@ if __name__ == "__main__":
 				losses.append(running_loss.data[0])
 				running_loss = 0.0
 
-	# Defining an iterator for the dataloader for train
-	# dataiter = iter(dataloaders['train'])
 
-	# Taking a batch of image dataset which are already in tensor form and ready to be fed into the network
-	# images, labels = dataiter.next()
-
-	# print(images)
-	# print(labels)
-
-	# outputs = finetune(net(Variable(images)))
-	# print(outputs)
-
-	# val,ind = torch.max(outputs,1)
-	# print(val,ind)
+	# testing
+	test_dataset = datasets.ImageFolder(root='test', transform=data_transforms['val'])
+	dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=128, shuffle=True, num_workers=4)
