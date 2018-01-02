@@ -3,6 +3,7 @@ package com.neoneye.android;
 import android.*;
 import android.Manifest;
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
@@ -35,6 +36,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.location.LocationServices;
 
 import org.json.JSONArray;
 import org.json.JSONObject;
@@ -47,23 +49,63 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
-public class DisplayResults extends AppCompatActivity {
+
+
+public class DisplayResults extends AppCompatActivity implements LocationListener{
 
     private RecyclerView recyclerView;
     private Button saveCropButton;
     private Button cancelCropButton;
     private JSONArray data;
     private String finalPath;
+    LocationManager locationManager;
 
-    private double lon, lat;
+    private double lon;
+    private double lat;
+    private Activity currActivity = this;
+
+    @Override
+    public void onLocationChanged(Location location) {
+        lat = location.getLatitude();
+        lon = location.getLongitude();
+        Log.d("Reached", "Reacged"+lat+lon);
+    }
+
+    @Override
+    public void onProviderDisabled(String provider) {
+        Toast.makeText(this, "Please Enable GPS and Internet", Toast.LENGTH_SHORT).show();
+    }
+
+    @Override
+    public void onStatusChanged(String provider, int status, Bundle extras) {
+
+    }
+
+    @Override
+    public void onProviderEnabled(String provider) {
+
+    }
+
+    void getLocation() {
+        try {
+            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
+            Log.d("Reached2", "Reacged2");
+        }
+        catch(SecurityException e) {
+            e.printStackTrace();
+        }
+    }
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_results);
 
-        lon = -100;
-        lat = -100;
+        getLocation();
+
+        Log.d("Location", "my location is "+lat+lon);
+
 
         /* other stuff */
         Intent intent = getIntent();
