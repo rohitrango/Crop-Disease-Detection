@@ -26,7 +26,8 @@
             </intent-filter>
         </activity>
         <activity android:name=".DisplayResults" />
-        <activity android:name=".MapsActivity"></activity>
+        <activity android:name=".MapsActivity" />
+        <activity android:name=".MyPlantsActivity"></activity>
     </application>
 
 </manifest>
