@@ -15,7 +15,7 @@ import time
 import os
 import torch.nn.functional as F
 import torch.optim as optim
-EPOCHS = 10000
+EPOCHS = 100
 
 __all__ = ['AlexNet', 'alexnet']
 
@@ -136,15 +136,15 @@ if __name__ == "__main__":
 
 	# https://discuss.pytorch.org/t/how-to-train-several-network-at-the-same-time/4920/6
 	parameters = set(finetune.parameters()) | set(net.classifier[-1].parameters())
-	optimizer = optim.SGD(parameters, lr=0.002, momentum=0.1)
+	optimizer = optim.SGD(parameters, lr=0.0005, momentum=0.9)
 
 	# Train dataloaders
 	train_dataset = datasets.ImageFolder(root='train', transform=data_transforms['train'])
-	dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=32, shuffle=True, num_workers=4)
+	dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=128, shuffle=True, num_workers=4)
 	
 	losses = []
-	running_loss = 0.0
 	for epoch in range(EPOCHS):
+		running_loss = 0.0
 		for i, data in enumerate(dataloader, 0):
 			# get the inputs
 			inputs, labels = data

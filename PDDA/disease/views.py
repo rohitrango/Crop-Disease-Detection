@@ -62,7 +62,6 @@ if is_cuda:
 data_transforms = {
 
 	'val': transforms.Compose([
-			transforms.RandomCrop(256, 256),
 			transforms.CenterCrop(224),
 			transforms.ToTensor(),
 			transforms.Normalize(mean=[0.485, 0.456, 0.406],
@@ -81,6 +80,7 @@ def success(request):
 	return HttpResponse("<h2>Image Upload successful</h2>")
 
 # Expect a POST Request with the MultiPart Data with the name of crop_image and a text data with the name of crop_name
+@csrf_exempt
 def upload_image_and_get_results(request):
 	if request.method == 'POST':
 		crop_name = request.POST['crop_name'] 
@@ -90,9 +90,14 @@ def upload_image_and_get_results(request):
 			output_dict = predict_with_name(crop_image, crop_index)
 		else:
 			output_dict = predict_without_name(crop_image)
-		return JsonResponse(output_dict, safe=False)
+		return JsonResponse({
+			'status' : True,
+			'response': output_dict,
+			}, safe=False)
 	else:
-		return HttpResponse("<h2>Wrong Page</h2>")
+		return JsonResponse({
+			'status' : False,
+			}, safe=False)
 
 
 def predict_without_name(image_arr):
