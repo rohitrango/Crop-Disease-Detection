@@ -50,8 +50,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-
-public class DisplayResults extends AppCompatActivity implements LocationListener{
+public class DisplayResults extends AppCompatActivity implements LocationListener {
 
     private RecyclerView recyclerView;
     private Button saveCropButton;
@@ -64,11 +63,14 @@ public class DisplayResults extends AppCompatActivity implements LocationListene
     private double lat;
     private Activity currActivity = this;
 
+    private boolean flag;
+
     @Override
     public void onLocationChanged(Location location) {
         lat = location.getLatitude();
         lon = location.getLongitude();
-        Log.d("Reached", "Reacged"+lat+lon);
+        Log.d("Reached", "Reached" + lat + lon);
+        flag = true;
     }
 
     @Override
@@ -87,13 +89,28 @@ public class DisplayResults extends AppCompatActivity implements LocationListene
     }
 
     void getLocation() {
-        try {
-            locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
-            Log.d("Reached2", "Reacged2");
+
+        locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(currActivity, new String[]{Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION}, 3003);
+            return;
         }
-        catch(SecurityException e) {
-            e.printStackTrace();
+        Location lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+        if(lastKnownLocation != null) {
+            lat = lastKnownLocation.getLatitude();
+            lon = lastKnownLocation.getLongitude();
+            Log.d("Reached", "XD" + lat + lon);
+            flag = true;
+        }
+        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
+        Log.d("Reached2", "Reached2");
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if(requestCode == 3003) {
+            getLocation();
         }
     }
 
@@ -157,6 +174,7 @@ public class DisplayResults extends AppCompatActivity implements LocationListene
                             map.put("device_ID", getDeviceID(getApplicationContext()));
                             map.put("lat", String.valueOf(lat));
                             map.put("lon", String.valueOf(lon));
+                            Log.w("LON in req:", String.valueOf(lon));
                             return map;
                         }
                     };
@@ -171,6 +189,7 @@ public class DisplayResults extends AppCompatActivity implements LocationListene
                     cv.put(db.KEY_TIME, time);
                     cv.put(db.KEY_LON, lon);
                     cv.put(db.KEY_LAT, lat);
+                    Log.w("LON in db:", String.valueOf(lon));
                     sql.insert(db.TABLE, null, cv);
                     Toast.makeText(getApplicationContext(), "Saved successfully.", Toast.LENGTH_LONG).show();
                     finish();

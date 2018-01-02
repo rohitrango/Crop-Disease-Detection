@@ -5,6 +5,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.util.Log;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -13,6 +14,7 @@ import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -46,8 +48,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
         Bundle bundle = getIntent().getExtras();
         crop = bundle.getString("plant", "");
-        lon = bundle.getDouble("lon", 0.0);
-        lat = bundle.getDouble("lat", 0.0);
+        lon = bundle.getDouble("lon");
+        lat = bundle.getDouble("lat");
+        Log.w("CROP: ", crop);
+        Log.w("LON: ", String.valueOf(lon));
+        Log.w("LAT: ", String.valueOf(lat));
+
     }
 
     @Override
@@ -77,7 +83,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                                     color = BitmapDescriptorFactory.HUE_GREEN;
                                 }
                                 else{
-                                    color = BitmapDescriptorFactory.HUE_RED;
+                                    color = Constants.colors[plant.getInt("index")];
                                 }
                                 mMap.addMarker(new MarkerOptions().
                                         position(plantloc).
@@ -106,7 +112,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         };
         queue.add(stringRequest);
 
-        LatLng center = new LatLng(lat, lon);
+        LatLng center = new LatLng(lat+0.001, lon+0.001);
+        mMap.addMarker(new MarkerOptions().position(center).title("Current location").icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_GREEN)));
         mMap.moveCamera(CameraUpdateFactory.newLatLng(center));
+
+        CameraUpdate zoom = CameraUpdateFactory.zoomTo(13);
+        mMap.animateCamera(zoom);
     }
 }

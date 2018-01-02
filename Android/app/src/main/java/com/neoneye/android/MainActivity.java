@@ -119,12 +119,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if(id == R.id.action_maps) {
-            Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
-            startActivity(intent);
-            return true;
-        }
-        else if(id == R.id.check_my_crops) {
+//        if(id == R.id.action_maps) {
+//            Intent intent = new Intent(getApplicationContext(), MapsActivity.class);
+//            startActivity(intent);
+//            return true;
+//        }
+        if(id == R.id.check_my_crops) {
             // history
             Intent intent = new Intent(getApplicationContext(), MyPlantsActivity.class);
             startActivity(intent);

@@ -2,11 +2,11 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     tools:context="com.neoneye.android.MainActivity">
-    <item
-        android:id="@+id/action_maps"
-        android:orderInCategory="1"
-        android:title="Check for diseases"
-        app:showAsAction="never" />
+    <!--<item-->
+        <!--android:id="@+id/action_maps"-->
+        <!--android:orderInCategory="1"-->
+        <!--android:title="Check for diseases"-->
+        <!--app:showAsAction="never" />-->
 
     <item
         android:id="@+id/check_my_crops"

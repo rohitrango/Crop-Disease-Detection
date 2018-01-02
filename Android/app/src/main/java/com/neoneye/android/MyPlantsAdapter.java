@@ -43,6 +43,8 @@ public class MyPlantsAdapter extends RecyclerView.Adapter<MyPlantsAdapter.ViewHo
                 p.category = c.getString(c.getColumnIndex(sql.KEY_CATEGORY));
                 p.prob = c.getDouble(c.getColumnIndex(sql.KEY_PROB));
                 p.date = new Date(c.getString(c.getColumnIndex(sql.KEY_TIME)));
+                p.lon = c.getDouble(c.getColumnIndex(sql.KEY_LON));
+                p.lat = c.getDouble(c.getColumnIndex(sql.KEY_LAT));
                 Log.e("PATH", p.path);
                 myPlants.add(p);
             } while(c.moveToNext());

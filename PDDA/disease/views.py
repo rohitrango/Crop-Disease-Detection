@@ -164,14 +164,14 @@ def get_crop_names(request):
 		}
 
 		categories = filter(lambda x: crop_name in x, idx_to_labels.values())
-		for category in categories:
+		for i, category in enumerate(categories):
 			query = Entry.objects.filter(category_name=category)
 			if query.count() > 0:
 				locs = np.array(map(lambda x: (x.gps_lat, x.gps_lon), query))
 				probs = np.array(map(lambda x: x.probability, query))
 				response['probs'][category] = get_normalized_probability(lat, lon, locs, probs)
 				response['locs'] += map(lambda x: {
-					'lat': x[0], 'lon': x[1], 'category_name': category, 'healthy': ("healthy" in category),
+					'lat': x[0], 'lon': x[1], 'category_name': category, 'healthy': ("healthy" in category), 'index': i,
 				}, locs)
 
 		print(response['probs'])
@@ -181,17 +181,15 @@ def get_crop_names(request):
 		return HttpResponse("0")
 
 
-def get_normalized_probability(lat, lon, locs, probs, SCALE=1e-8):
-	print(lat, lon)
+def get_normalized_probability(lat, lon, locs, probs, SCALE=1e-3):
 	X_test = np.array([[lat, lon]])
 	nbrs = min(25, probs.shape[0])
 	reg = KNeighborsRegressor(metric=haversine, n_neighbors=nbrs, weights='distance')
 	reg.fit(locs, probs)
 	mean_coord = locs.mean(axis=0)
-	print(mean_coord)
 	mean_dist = haversine(X_test[0], mean_coord)
 	print(mean_dist)
-	return (reg.predict(X_test)[0])*np.exp(-SCALE*(mean_dist)**2)
+	return (reg.predict(X_test)[0])*np.exp(-SCALE*(mean_dist))
 
 
 def predict_without_name(image_arr):
