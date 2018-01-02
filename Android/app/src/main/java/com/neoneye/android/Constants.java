@@ -10,4 +10,5 @@ public class Constants {
     public static String serverloc = BaseURL + "upload_image_and_get_results/";
     public static String save_entry_loc = BaseURL + "save_entry";
     public static String update_crops = BaseURL + "update_crops";
+    public static String get_entry = BaseURL + "get_crops";
 }

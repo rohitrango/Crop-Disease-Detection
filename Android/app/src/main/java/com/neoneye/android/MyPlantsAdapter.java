@@ -1,6 +1,7 @@
 package com.neoneye.android;
 
 import android.content.Context;
+import android.content.Intent;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
@@ -11,11 +12,14 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.StringTokenizer;
 
 /**
  * Created by rohitrango on 2/1/18.
@@ -55,9 +59,8 @@ public class MyPlantsAdapter extends RecyclerView.Adapter<MyPlantsAdapter.ViewHo
 
     @Override
     public void onBindViewHolder(ViewHolder holder, int position) {
-        MyPlants p = myPlants.get(position);
+        final MyPlants p = myPlants.get(position);
         Bitmap b = BitmapFactory.decodeFile(p.path);
-        // TODO: Fix this to enable showing of images
         if(b != null) {
             Log.e("ok", b.toString());
             holder.cropView.setImageBitmap(b);
@@ -68,6 +71,17 @@ public class MyPlantsAdapter extends RecyclerView.Adapter<MyPlantsAdapter.ViewHo
         int t = (int) (p.prob*10000);
         double d = t/100.0;
         holder.prob.setText(String.valueOf(d) + "%");
+        holder.linearLayout.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(ctx, MapsActivity.class);
+                String plant = p.category.split("__")[0];
+                intent.putExtra("plant", plant);
+                intent.putExtra("lon", p.lon);
+                intent.putExtra("lat", p.lat);
+                ctx.startActivity(intent);
+            }
+        });
     }
 
     @Override
@@ -81,6 +95,7 @@ public class MyPlantsAdapter extends RecyclerView.Adapter<MyPlantsAdapter.ViewHo
         public TextView category;
         public TextView time;
         public TextView prob;
+        public LinearLayout linearLayout;
 
         public ViewHolder(View itemView) {
             super(itemView);
@@ -88,6 +103,7 @@ public class MyPlantsAdapter extends RecyclerView.Adapter<MyPlantsAdapter.ViewHo
             category = itemView.findViewById(R.id.category);
             time     = itemView.findViewById(R.id.time);
             prob     = itemView.findViewById(R.id.probability);
+            linearLayout = itemView.findViewById(R.id.main_clicker);
         }
     }
 }

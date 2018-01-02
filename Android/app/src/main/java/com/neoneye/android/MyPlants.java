@@ -14,4 +14,7 @@ public class MyPlants {
     public double prob;
     public Bitmap bitmap;
     public Date date;
+
+    public double lon;
+    public double lat;
 }
