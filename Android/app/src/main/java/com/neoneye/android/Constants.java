@@ -7,5 +7,5 @@ package com.neoneye.android;
 public class Constants {
 
     public static String serverloc = "http://10.196.22.201:8000/upload_image_and_get_results/";
-
+    public static String save_entry_loc = "http://10.196.22.201:8000/save_entry";
 }

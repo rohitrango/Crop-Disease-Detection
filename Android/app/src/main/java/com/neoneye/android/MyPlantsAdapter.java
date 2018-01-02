@@ -58,7 +58,11 @@ public class MyPlantsAdapter extends RecyclerView.Adapter<MyPlantsAdapter.ViewHo
         MyPlants p = myPlants.get(position);
         Bitmap b = BitmapFactory.decodeFile(p.path);
         // TODO: Fix this to enable showing of images
-//        holder.cropView.setImageBitmap(b);
+        if(b != null) {
+            Log.e("ok", b.toString());
+            holder.cropView.setImageBitmap(b);
+        }
+
         holder.category.setText(p.category);
         holder.time.setText(p.date.toString());
         int t = (int) (p.prob*10000);
@@ -80,7 +84,7 @@ public class MyPlantsAdapter extends RecyclerView.Adapter<MyPlantsAdapter.ViewHo
 
         public ViewHolder(View itemView) {
             super(itemView);
-            cropView = itemView.findViewById(R.id.crop_names);
+            cropView = itemView.findViewById(R.id.crop_image);
             category = itemView.findViewById(R.id.category);
             time     = itemView.findViewById(R.id.time);
             prob     = itemView.findViewById(R.id.probability);

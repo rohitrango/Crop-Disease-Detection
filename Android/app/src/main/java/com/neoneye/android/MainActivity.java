@@ -51,6 +51,7 @@ public class MainActivity extends AppCompatActivity {
     private LinearLayout frameLayout;
     private ProgressBar progressBar;
     private Bitmap bitmap;
+    private String finalPath;
 
     MainActivity currActivity;
 
@@ -153,6 +154,7 @@ public class MainActivity extends AppCompatActivity {
                 System.out.println(bitmap.toString());
                 System.out.println("done");
                 cropimg.setImageBitmap(bitmap);
+                finalPath = plantimg.getPath();
             }
             else{
                 System.out.println("error");
@@ -211,7 +213,7 @@ public class MainActivity extends AppCompatActivity {
                     Intent intent = new Intent(currActivity, DisplayResults.class);
                     String message = response.getJSONArray("response").toString();
                     intent.putExtra("Json", message);
-                    intent.putExtra("image", bitmap);
+                    intent.putExtra("image", finalPath);
                     startActivity(intent);
                 }
                 else{

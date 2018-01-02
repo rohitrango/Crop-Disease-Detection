@@ -28,6 +28,9 @@ import torch.optim as optim
 import json
 from django.conf import settings
 from .torchmodels import *
+from datetime import datetime
+from .models import *
+
 # Create your views here.
 # Load the labels one-time
 with open(os.path.join(settings.BASE_DIR, "labels.json")) as f:
@@ -99,6 +102,36 @@ def upload_image_and_get_results(request):
 			'status' : False,
 			}, safe=False)
 
+@csrf_exempt
+def save_entry(request):
+	if request.method == 'POST':
+		category_name = request.POST['category_name']
+		prob = float(request.POST['prob'])
+		lat = float(request.POST['lat'])
+		lon = float(request.POST['lon'])
+		deviceID = request.POST['device_ID']
+		timestamp = datetime.now()
+		Q = DeviceID.objects.filter(deviceID=deviceID)
+		if Q.count() == 0:
+			deviceID_obj = DeviceID.objects.create(deviceID=deviceID)
+			deviceID_obj.save()
+		else:
+			deviceID_obj = Q[0]
+		entry = Entry.objects.create(deviceID = deviceID_obj, gps_lat = lat, gps_lon= lon, probability=prob, category_name=category_name, timestamp =timestamp)
+		entry.save()
+		return JsonResponse({'status': True})
+		# try :
+		# 	entry = Entry(deviceID = deviceID, gps_lat = lat, gps_lon= lon, probability=prob, category_name=category_name, timestamp =timestamp)
+		# 	entry.save()
+		# except:
+		# 	try:
+		# 		deviceID_obj = DeviceID(deviceID)
+		# 		deviceID_obj.save()
+		# 		entry = Entry(deviceID = deviceID, gps_lat = lat, gps_lon= lon, probability=prob, category_name=category_name, timestamp =timestamp)
+		# 		entry.save()
+		# 	except:
+		# 		return JsonResponse({'status' : False})
+		# return JsonResponse({'status' : True})
 
 def predict_without_name(image_arr):
 	print("Without name \n\n\n")

@@ -6,6 +6,7 @@ import android.content.ContextWrapper;
 import android.content.Intent;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.os.AsyncTask;
 import android.provider.Settings;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -18,30 +19,47 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
+import com.android.volley.Request;
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.Volley;
+
 import org.json.JSONArray;
+import org.json.JSONObject;
 
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 public class DisplayResults extends AppCompatActivity {
 
     private RecyclerView recyclerView;
     private Button saveCropButton;
     private Button cancelCropButton;
-    private Bitmap bitmap;
     private JSONArray data;
+    private String finalPath;
+
+    private double lon, lat;
 
     @Override
     protected void onCreate(final Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_display_results);
 
+        lon = -100;
+        lat = -100;
+
         Intent intent = getIntent();
         String results = intent.getStringExtra("Json");
-        bitmap = (Bitmap) intent.getParcelableExtra("image");
+        finalPath = intent.getStringExtra("image");
+//        bitmap = (Bitmap) intent.getParcelableExtra("image");
 
         Context context = getBaseContext();
         recyclerView = (RecyclerView) findViewById(R.id.crop_list);
@@ -59,13 +77,40 @@ public class DisplayResults extends AppCompatActivity {
             @Override
             public void onClick(View view) {
                 try {
-                    String path     = saveToInternalStorage(bitmap);
-                    String category = data.getJSONObject(0).getString("category_name");
-                    double prob     = data.getJSONObject(0).getDouble("prob");
+                    String path     = finalPath;
+                    final String category = data.getJSONObject(0).getString("category_name");
+                    final double prob     = data.getJSONObject(0).getDouble("prob");
                     Date currentTime = Calendar.getInstance().getTime();
                     String time = currentTime.toString();
 
                     // TODO: send an API call to the URL as well
+                    RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
+                    String url = Constants.save_entry_loc;
+                    StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
+                            new Response.Listener<String>() {
+                                @Override
+                                public void onResponse(String response) {
+
+                                }
+                            }, new Response.ErrorListener() {
+                        @Override
+                        public void onErrorResponse(VolleyError error) {
+                            error.printStackTrace();
+                        }
+                    }){
+                        @Override
+                        protected Map<String, String> getParams() throws AuthFailureError {
+                            Map<String, String> map = new HashMap<String, String>();
+                            map.put("category_name", category);
+                            map.put("prob", String.valueOf(prob));
+                            map.put("device_ID", getDeviceID(getApplicationContext()));
+                            map.put("lat", String.valueOf(lat));
+                            map.put("lon", String.valueOf(lon));
+                            return map;
+                        }
+                    };
+                    queue.add(stringRequest);
+
                     Database db = new Database(getApplicationContext());
                     SQLiteDatabase sql = db.getWritableDatabase();
                     ContentValues cv = new ContentValues();
@@ -127,4 +172,5 @@ public class DisplayResults extends AppCompatActivity {
         }
         return mypath.getAbsolutePath();
     }
+
 }
