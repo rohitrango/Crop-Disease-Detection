@@ -1,13 +1,22 @@
 package com.neoneye.android;
 
+import android.*;
+import android.Manifest;
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.ContextWrapper;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.database.sqlite.SQLiteDatabase;
 import android.graphics.Bitmap;
+import android.location.Location;
+import android.location.LocationListener;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
@@ -56,6 +65,7 @@ public class DisplayResults extends AppCompatActivity {
         lon = -100;
         lat = -100;
 
+        /* other stuff */
         Intent intent = getIntent();
         String results = intent.getStringExtra("Json");
         finalPath = intent.getStringExtra("image");
@@ -83,7 +93,6 @@ public class DisplayResults extends AppCompatActivity {
                     Date currentTime = Calendar.getInstance().getTime();
                     String time = currentTime.toString();
 
-                    // TODO: send an API call to the URL as well
                     RequestQueue queue = Volley.newRequestQueue(getApplicationContext());
                     String url = Constants.save_entry_loc;
                     StringRequest stringRequest = new StringRequest(Request.Method.POST, url,
@@ -118,6 +127,8 @@ public class DisplayResults extends AppCompatActivity {
                     cv.put(db.KEY_PATH, path);
                     cv.put(db.KEY_PROB, prob);
                     cv.put(db.KEY_TIME, time);
+                    cv.put(db.KEY_LON, lon);
+                    cv.put(db.KEY_LAT, lat);
                     sql.insert(db.TABLE, null, cv);
                     Toast.makeText(getApplicationContext(), "Saved successfully.", Toast.LENGTH_LONG).show();
                     finish();
@@ -142,6 +153,7 @@ public class DisplayResults extends AppCompatActivity {
         } catch (Exception e) {
             e.printStackTrace();
         }
+
     }
 
     /* get android_id */
@@ -151,7 +163,8 @@ public class DisplayResults extends AppCompatActivity {
         return android_id;
     }
 
-    // For saving to internal storage
+    // For saving to internal storage (not required now)
+    @Deprecated
     private String saveToInternalStorage(Bitmap bitmapImage){
         ContextWrapper cw = new ContextWrapper(getApplicationContext());
         File directory = cw.getDir("imageDir", Context.MODE_PRIVATE);

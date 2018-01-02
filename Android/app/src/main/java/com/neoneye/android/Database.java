@@ -11,7 +11,7 @@ public class Database extends SQLiteOpenHelper {
 
     // All Static variables
     // Database Version
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
 
     // Database Name
     public static final String DATABASE_NAME = "crops";
@@ -26,6 +26,10 @@ public class Database extends SQLiteOpenHelper {
     public static final String KEY_TIME = "time";
     public static final String KEY_ID   = "id";
 
+    public static final String KEY_LON  = "lon";
+    public static final String KEY_LAT  = "lat";
+
+
     public Database(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
@@ -35,6 +39,7 @@ public class Database extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db) {
         String CREATE_CONTACTS_TABLE = "CREATE TABLE " + TABLE + "("
                 + KEY_PATH + " TEXT," + KEY_CATEGORY + " TEXT," + KEY_TIME + " TEXT," + KEY_ID + " INTEGER PRIMARY KEY AUTOINCREMENT, "
+                + KEY_LAT  + " REAL, " + KEY_LON + " REAL,"
                 + KEY_PROB + " REAL" + ")";
         db.execSQL(CREATE_CONTACTS_TABLE);
     }
