@@ -50,6 +50,7 @@ public class MainActivity extends AppCompatActivity {
 
     private LinearLayout frameLayout;
     private ProgressBar progressBar;
+    private Bitmap bitmap;
 
     MainActivity currActivity;
 
@@ -122,6 +123,11 @@ public class MainActivity extends AppCompatActivity {
             startActivity(intent);
             return true;
         }
+        else if(id == R.id.check_my_crops) {
+            Intent intent = new Intent(getApplicationContext(), MyPlantsActivity.class);
+            startActivity(intent);
+            return true;
+        }
         return super.onOptionsItemSelected(item);
     }
 
@@ -129,7 +135,7 @@ public class MainActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (resultCode == Activity.RESULT_OK) {
             //pick image from gallery
-            Bitmap bitmap = null;
+            bitmap = null;
             Uri selectedImage = data.getData();
             String[] filePathColumn = {MediaStore.Images.Media.DATA};
 
@@ -204,7 +210,8 @@ public class MainActivity extends AppCompatActivity {
                 if(response.getBoolean("status")){
                     Intent intent = new Intent(currActivity, DisplayResults.class);
                     String message = response.getJSONArray("response").toString();
-                    intent.putExtra("Json",message);
+                    intent.putExtra("Json", message);
+                    intent.putExtra("image", bitmap);
                     startActivity(intent);
                 }
                 else{
