@@ -1,4 +1,21 @@
 <resources>
     <string name="app_name">Android</string>
     <string name="action_settings">Settings</string>
+    <string-array name="crop_names">
+        <item>Don\'t know</item>
+        <item>Tomato</item>
+        <item>Grape</item>
+        <item>Apple</item>
+        <item>Peach</item>
+        <item>Potato</item>
+        <item>Soybean</item>
+        <item>Pepper,_bell</item>
+        <item>Squash</item>
+        <item>Strawberry</item>
+        <item>Corn_(maize)</item>
+        <item>Orange</item>
+        <item>Cherry_(including_sour)</item>
+        <item>Raspberry</item>
+        <item>Blueberry</item>
+    </string-array>
 </resources>
