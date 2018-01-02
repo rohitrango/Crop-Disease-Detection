@@ -30,6 +30,9 @@ from django.conf import settings
 from .torchmodels import *
 from datetime import datetime
 from .models import *
+from sklearn.neighbors import KNeighborsRegressor
+import numpy as np
+from haversine import haversine
 
 # Create your views here.
 # Load the labels one-time
@@ -138,10 +141,51 @@ def update_crops(request):
 			if request.POST.get(label) is not None:
 				r = UserPlant.objects.create(deviceID=deviceID_obj, plant_name=label)
 				r.save()
-		
+
 		return HttpResponse("1")
 	else:
 		return HttpResponse("0")
+
+
+@csrf_exempt
+def get_crop_names(request):
+	if request.method == "POST":
+		crop_name = request.POST['crop_name']
+		lat = float(request.POST['lat'])
+		lon = float(request.POST['lon'])
+
+		# final response
+		response = {
+			'probs': {
+
+			},
+
+			'locs': [],
+		}
+
+		categories = filter(lambda x: crop_name in x, idx_to_labels.values())
+		for category in categories:
+			query = Entry.objects.filter(category_name=category)
+			if query.count() > 0:
+				locs = np.array(map(lambda x: (x.gps_lat, x.gps_lon), query))
+				probs = np.array(map(lambda x: x.probability, query))
+				prob_response['probs'][category] = get_normalized_probability(lat, lon, locs, probs)
+				response['locs'] += map(lambda x: {
+					'lat': x[0], 'lon': x[1], 'category_name': category
+				}, locs)
+
+		return JsonResponse(prob_response, safe=False)
+	else:
+		return HttpResponse("0")
+
+
+def get_normalized_probability(lat, lon, locs, probs, SCALE=1e-2):
+	X_test = np.array([[lat, lon]])
+	nbrs = min(25, probs.shape[0])
+	reg = KNeighborsRegressor(metric=haversine, n_neighbors=nbrs, weights='distance')
+	reg.fit(locs, probs)
+	mean_dist = haversine(X_test[0], locs.mean(axis=0))
+	return (reg.predict(X_test)[0])*np.exp(-SCALE*mean_dist)
 
 
 def predict_without_name(image_arr):
