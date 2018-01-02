@@ -76,6 +76,7 @@ public class MainActivity extends AppCompatActivity {
         submit.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+
                 String crop_name_send = String.valueOf(spinner.getSelectedItem());
                 if(plantimg == null){
                     Toast.makeText(getApplicationContext(), "Please enter image first!", Toast.LENGTH_SHORT).show();
@@ -91,7 +92,7 @@ public class MainActivity extends AppCompatActivity {
         imgbutton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Log.d("Msg","reached here");
+
                 int result = ContextCompat.checkSelfPermission(currActivity, Manifest.permission.READ_EXTERNAL_STORAGE);
                 if(result == PackageManager.PERMISSION_GRANTED){
                     Intent galleryIntent = new Intent(Intent.ACTION_PICK, android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI);
