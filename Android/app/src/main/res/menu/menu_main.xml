@@ -11,6 +11,12 @@
     <item
         android:id="@+id/check_my_crops"
         android:orderInCategory="2"
-        android:title="My plants"
+        android:title="History"
+        />
+
+    <item
+        android:id="@+id/my_crop_list"
+        android:orderInCategory="3"
+        android:title="My crops"
         />
 </menu>

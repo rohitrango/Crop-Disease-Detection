@@ -125,7 +125,14 @@ public class MainActivity extends AppCompatActivity {
             return true;
         }
         else if(id == R.id.check_my_crops) {
+            // history
             Intent intent = new Intent(getApplicationContext(), MyPlantsActivity.class);
+            startActivity(intent);
+            return true;
+        }
+        else if(id == R.id.my_crop_list) {
+            // my plants
+            Intent intent = new Intent(getApplicationContext(), MyCropListActivity.class);
             startActivity(intent);
             return true;
         }

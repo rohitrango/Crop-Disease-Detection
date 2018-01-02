@@ -120,18 +120,29 @@ def save_entry(request):
 		entry = Entry.objects.create(deviceID = deviceID_obj, gps_lat = lat, gps_lon= lon, probability=prob, category_name=category_name, timestamp =timestamp)
 		entry.save()
 		return JsonResponse({'status': True})
-		# try :
-		# 	entry = Entry(deviceID = deviceID, gps_lat = lat, gps_lon= lon, probability=prob, category_name=category_name, timestamp =timestamp)
-		# 	entry.save()
-		# except:
-		# 	try:
-		# 		deviceID_obj = DeviceID(deviceID)
-		# 		deviceID_obj.save()
-		# 		entry = Entry(deviceID = deviceID, gps_lat = lat, gps_lon= lon, probability=prob, category_name=category_name, timestamp =timestamp)
-		# 		entry.save()
-		# 	except:
-		# 		return JsonResponse({'status' : False})
-		# return JsonResponse({'status' : True})
+
+@csrf_exempt
+def update_crops(request):
+	if request.method == "POST":
+		deviceID = request.POST['deviceID']
+		
+		Q = DeviceID.objects.filter(deviceID=deviceID)
+		if Q.count() == 0:
+			deviceID_obj = DeviceID.objects.create(deviceID=deviceID)
+			deviceID_obj.save()
+		else:
+			deviceID_obj = Q[0]
+
+		UserPlant.objects.filter(deviceID=deviceID_obj).delete()
+		for label in plant_labels:
+			if request.POST.get(label) is not None:
+				r = UserPlant.objects.create(deviceID=deviceID_obj, plant_name=label)
+				r.save()
+		
+		return HttpResponse("1")
+	else:
+		return HttpResponse("0")
+
 
 def predict_without_name(image_arr):
 	print("Without name \n\n\n")

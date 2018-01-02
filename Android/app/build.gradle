@@ -26,10 +26,11 @@ dependencies {
     })
 
 //added
-    compile 'com.google.android.gms:play-services:6.5.87'
-//ended
-    compile 'com.android.volley:volley:1.0.0'
+    //ended
+    
 
+    compile 'com.google.android.gms:play-services:6.5.87'
+    compile 'com.android.volley:volley:1.0.0'
     compile 'com.android.support:appcompat-v7:26.+'
     compile 'com.android.support.constraint:constraint-layout:1.0.2'
     compile 'com.android.support:design:26.+'

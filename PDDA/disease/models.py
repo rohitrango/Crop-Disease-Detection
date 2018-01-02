@@ -13,3 +13,8 @@ class Entry(models.Model):
 
 class DeviceID(models.Model):
 	deviceID = models.CharField(max_length=60)
+
+class UserPlant(models.Model):
+	deviceID = models.ForeignKey("DeviceID")
+	plant_name = models.CharField(max_length=30)
+

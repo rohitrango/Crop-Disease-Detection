@@ -9,11 +9,11 @@
     <uses-feature android:name="android.hardware.camera" />
     <uses-feature android:name="android.hardware.camera.autofocus" />
 
-    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
-    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
+    <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-feature android:name="android.hardware.location.gps" />
 
+    <uses-feature android:name="android.hardware.location.gps" />
 
     <application
         android:allowBackup="true"
@@ -23,19 +23,19 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
 
-
-    <!--added-->
+        <!-- added -->
 
         <permission
             android:name="com.example.mapexdemo.permission.MAPS_RECEIVE"
             android:protectionLevel="signature" />
+
         <meta-data
             android:name="com.google.android.maps.v2.API_KEY"
             android:value="AIzaSyDjeYVSAppDwdTOElkbI0brt2qPnZJhAzU" />
-        <meta-data android:name="com.google.android.gms.version"
+        <meta-data
+            android:name="com.google.android.gms.version"
             android:value="@integer/google_play_services_version" />
-    <!--ended-->
-
+        <!-- ended -->
 
         <activity android:name=".MainActivity">
             <intent-filter>
@@ -46,7 +46,8 @@
         </activity>
         <activity android:name=".DisplayResults" />
         <activity android:name=".MapsActivity" />
-        <activity android:name=".MyPlantsActivity"></activity>
+        <activity android:name=".MyPlantsActivity" />
+        <activity android:name=".MyCropListActivity"></activity>
     </application>
 
 </manifest>

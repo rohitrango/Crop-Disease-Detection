@@ -18,4 +18,22 @@
         <item>Raspberry</item>
         <item>Blueberry</item>
     </string-array>
+
+    <!-- my crops -->
+    <string-array name="my_crops">
+        <item>Tomato</item>
+        <item>Grape</item>
+        <item>Apple</item>
+        <item>Peach</item>
+        <item>Potato</item>
+        <item>Soybean</item>
+        <item>Pepper,_bell</item>
+        <item>Squash</item>
+        <item>Strawberry</item>
+        <item>Corn_(maize)</item>
+        <item>Orange</item>
+        <item>Cherry_(including_sour)</item>
+        <item>Raspberry</item>
+        <item>Blueberry</item>
+    </string-array>
 </resources>
