@@ -102,7 +102,7 @@ public class DisplayResults extends AppCompatActivity implements LocationListene
             Log.d("Reached", "XD" + lat + lon);
             flag = true;
         }
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 1000, 1, this);
+        locationManager.requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 1000, 1, this);
         Log.d("Reached2", "Reached2");
     }
 

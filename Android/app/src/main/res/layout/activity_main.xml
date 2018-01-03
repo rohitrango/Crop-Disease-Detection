@@ -31,6 +31,7 @@
             app:layout_constraintHorizontal_bias="0.504" />
 
         <LinearLayout
+            android:background="@android:color/background_light"
             android:layout_margin="20px"
             android:layout_gravity="center"
             android:orientation="horizontal"
@@ -57,21 +58,34 @@
             android:layout_width="match_parent"
             android:layout_height="50px" />
 
-        <Button
-            android:id="@+id/imageButton"
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Choose Image"
-            android:layout_marginBottom="8dp" />
+        <LinearLayout
+            android:orientation="horizontal"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <Button
-            android:id="@+id/button"
-            android:layout_gravity="center"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Submit"
-            android:layout_marginBottom="8dp" />
+            <Button
+                android:layout_margin="8px"
+                android:layout_weight="1"
+                android:id="@+id/imageButton"
+                android:background="#33cc33"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Choose Image"
+                android:layout_marginBottom="8dp" />
+
+            <Button
+                android:layout_margin="8px"
+                android:background="#33cc33"
+                android:layout_weight="1"
+                android:id="@+id/button"
+                android:layout_gravity="center"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Submit"
+                android:layout_marginBottom="8dp" />
+
+        </LinearLayout>
 
 
 
