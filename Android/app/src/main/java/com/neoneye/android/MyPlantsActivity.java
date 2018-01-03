@@ -20,6 +20,8 @@ public class MyPlantsActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_my_plants);
 
+        setTitle("History");
+
         progressBar = (ProgressBar) findViewById(R.id.myplants_progressbar);
         recyclerView = (RecyclerView) findViewById(R.id.myplants_recyclerview);
         nothing = (TextView) findViewById(R.id.nothing_to_show);

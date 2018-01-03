@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
 
         currActivity = this;
-        currActivity.setTitle("PDDA");
+        currActivity.setTitle("Home");
         Context context = this.getBaseContext();
 
         submit = (Button) findViewById(R.id.button);

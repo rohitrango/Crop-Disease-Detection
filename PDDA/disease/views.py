@@ -156,9 +156,7 @@ def get_crop_names(request):
 
 		# final response
 		response = {
-			'probs': {
-
-			},
+			'probs': [],
 
 			'locs': [],
 		}
@@ -169,11 +167,15 @@ def get_crop_names(request):
 			if query.count() > 0:
 				locs = np.array(map(lambda x: (x.gps_lat, x.gps_lon), query))
 				probs = np.array(map(lambda x: x.probability, query))
-				response['probs'][category] = get_normalized_probability(lat, lon, locs, probs)
+				response['probs'].append({
+					"category_name" : category,
+					"prob"			: get_normalized_probability(lat, lon, locs, probs),
+					}) 
 				response['locs'] += map(lambda x: {
 					'lat': x[0], 'lon': x[1], 'category_name': category, 'healthy': ("healthy" in category), 'index': i,
 				}, locs)
 
+		response['probs'] = sorted(response['probs'], key=lambda x: x['prob'], reverse=True)
 		print(response['probs'])
 
 		return JsonResponse(response, safe=False)
@@ -188,7 +190,6 @@ def get_normalized_probability(lat, lon, locs, probs, SCALE=1e-3):
 	reg.fit(locs, probs)
 	mean_coord = locs.mean(axis=0)
 	mean_dist = haversine(X_test[0], mean_coord)
-	print(mean_dist)
 	return (reg.predict(X_test)[0])*np.exp(-SCALE*(mean_dist))
 
 

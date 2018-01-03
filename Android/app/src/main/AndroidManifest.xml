@@ -53,6 +53,7 @@
         <activity android:name=".MapsActivity" />
         <activity android:name=".MyPlantsActivity" />
         <activity android:name=".MyCropListActivity" />
+        <activity android:name=".PlantDangerActivity"></activity>
     </application>
 
 </manifest>

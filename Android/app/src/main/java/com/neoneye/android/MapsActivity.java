@@ -1,11 +1,14 @@
 package com.neoneye.android;
 
+import android.animation.FloatArrayEvaluator;
 import android.content.Intent;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
 import android.util.Log;
+import android.view.View;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
@@ -38,6 +41,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private double lat;
     private String crop;
 
+    private FloatingActionButton button;
+    private String response_to_prob;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -53,6 +59,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Log.w("CROP: ", crop);
         Log.w("LON: ", String.valueOf(lon));
         Log.w("LAT: ", String.valueOf(lat));
+
+        button = (FloatingActionButton) findViewById(R.id.fab);
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(getApplicationContext(), PlantDangerActivity.class);
+                intent.putExtra("response", response_to_prob);
+                startActivity(intent);
+            }
+        });
 
     }
 
@@ -72,6 +88,9 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                             JSONObject res = new JSONObject(response);
 
                             JSONArray plant_list = res.getJSONArray("locs");
+                            response_to_prob = res.getJSONArray("probs").toString();
+                            Log.w("response_to_prob", response_to_prob);
+
                             for (int i = 0; i < plant_list.length(); i++) {
                                 JSONObject plant = plant_list.getJSONObject(i);
                                 Float lat = Float.valueOf(plant.getString("lat"));

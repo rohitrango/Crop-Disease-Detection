@@ -53,6 +53,7 @@ public class MyCropListActivity extends AppCompatActivity {
                 finish();
             }
         });
+        setTitle("My Crops");
 
         saveBtn.setOnClickListener(new View.OnClickListener() {
             @Override

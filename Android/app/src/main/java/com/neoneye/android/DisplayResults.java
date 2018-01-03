@@ -122,7 +122,7 @@ public class DisplayResults extends AppCompatActivity implements LocationListene
         getLocation();
 
         Log.d("Location", "my location is "+lat+lon);
-
+        setTitle("Prediction results");
 
         /* other stuff */
         Intent intent = getIntent();

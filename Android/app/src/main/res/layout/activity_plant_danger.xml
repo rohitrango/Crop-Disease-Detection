@@ -1,0 +1,23 @@
+<FrameLayout android:layout_width="match_parent" android:layout_height="match_parent"
+    xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <TextView
+        android:visibility="gone"
+        android:id="@+id/nothing_to_show"
+        android:textAlignment="center"
+        android:textSize="15dp"
+        android:text="Sorry, nothing to show"
+        android:layout_gravity="center"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content" />
+
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/danger_recyclerview"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+
+    </android.support.v7.widget.RecyclerView>
+
+
+</FrameLayout>
