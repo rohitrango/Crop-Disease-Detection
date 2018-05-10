@@ -161,23 +161,30 @@ def get_crop_names(request):
 			'locs': [],
 		}
 
+		sum_ = 0.0
 		categories = filter(lambda x: crop_name in x, idx_to_labels.values())
 		for i, category in enumerate(categories):
 			query = Entry.objects.filter(category_name=category)
 			if query.count() > 0:
 				locs = np.array(map(lambda x: (x.gps_lat, x.gps_lon), query))
 				probs = np.array(map(lambda x: x.probability, query))
+
+				k = get_normalized_probability(lat, lon, locs, probs)
+				sum_ += k
+
 				response['probs'].append({
 					"category_name" : category,
-					"prob"			: get_normalized_probability(lat, lon, locs, probs),
+					"prob"			: k,
 					}) 
 				response['locs'] += map(lambda x: {
 					'lat': x[0], 'lon': x[1], 'category_name': category, 'healthy': ("healthy" in category), 'index': i,
 				}, locs)
 
 		response['probs'] = sorted(response['probs'], key=lambda x: x['prob'], reverse=True)
-		print(response['probs'])
 
+		# print(response, sum_)	
+		# for i in xrange(len(response['probs'])):
+		# 	response['probs'][i]['prob'] = response['probs'][i]['prob']/sum_
 		return JsonResponse(response, safe=False)
 	else:
 		return HttpResponse("0")
@@ -243,7 +250,7 @@ def predict_with_name(image_arr, crop_idx):
 		final.append({
 			'rank'			:	i,
 			'category'		: 	ind[0].data[i],
-			'category_name'	:  	idx_to_labels[str(ind[0].data[i])],
+			'category_name'	:  	idx_to_labels_v2[str(ind[0].data[i])],
 			'prob'			:	val[0].data[i],
 		})
 

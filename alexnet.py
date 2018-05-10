@@ -15,7 +15,7 @@ import time
 import os
 import torch.nn.functional as F
 import torch.optim as optim
-EPOCHS = 100
+EPOCHS = 2000
 
 __all__ = ['AlexNet', 'alexnet']
 
@@ -93,13 +93,16 @@ def alexnet(pretrained=False, **kwargs):
 # Refer to this: http://www.image-net.org/challenges/LSVRC/2012/supervision.pdf
 if __name__ == "__main__":
 	# sample forward
-	is_cuda = torch.cuda.is_available()	
-	net = alexnet(True)
+	is_cuda = torch.cuda.is_available()
+	pretrained = True
+	print("Pretrained network: {0}".format(pretrained))	
+	net = alexnet(pretrained)
 	# We don't change the already learnt parameters as of now
 	# only let the last layer be allowed
 	# There are 8 trainable layers, and each layer contains 2 params
-	for param in list(net.parameters())[:-2]:
-		param.requires_grad = False
+	if pretrained:		
+		for param in list(net.parameters())[:-2]:
+			param.requires_grad = False
 
 	finetune = MyNet()
 	finetune.load_state_dict(torch.load("PDDA/torchmodels/finetune.pt"))
@@ -135,12 +138,16 @@ if __name__ == "__main__":
 	# Stochastic Gradient Descent
 
 	# https://discuss.pytorch.org/t/how-to-train-several-network-at-the-same-time/4920/6
-	parameters = set(finetune.parameters()) | set(net.classifier[-1].parameters())
-	optimizer = optim.SGD(parameters, lr=0.0005, momentum=0.9)
+	if pretrained:		
+		parameters = set(finetune.parameters()) | set(net.classifier[-1].parameters())
+	else:
+		parameters = set(finetune.parameters()) | set(net.parameters())
+
+	optimizer = optim.SGD(parameters, lr=0.005, momentum=0.9)
 
 	# Train dataloaders
 	train_dataset = datasets.ImageFolder(root='train', transform=data_transforms['train'])
-	dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=128, shuffle=True, num_workers=4)
+	dataloader = torch.utils.data.DataLoader(train_dataset, batch_size=64, shuffle=True, num_workers=4)
 	
 	losses = []
 	for epoch in range(EPOCHS):
@@ -168,7 +175,17 @@ if __name__ == "__main__":
 				losses.append(running_loss.data[0])
 				running_loss = 0.0
 
+		# After certain epochs
+		# if epoch%10==0:
+		# 	torch.save(net.state_dict(), 'alexnet.pt')
+		# 	torch.save(finetune.state_dict(), 'finetune.pt')
 
+
+	torch.save(net.state_dict(), 'alexnet.pt')
+	torch.save(finetune.state_dict(), 'finetune.pt')
+	print("Saved both models.")
 	# testing
-	test_dataset = datasets.ImageFolder(root='test', transform=data_transforms['val'])
-	dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=128, shuffle=True, num_workers=4)
+	# test_dataset = datasets.ImageFolder(root='test', transform=data_transforms['val'])
+	# dataloader = torch.utils.data.DataLoader(test_dataset, batch_size=128, shuffle=True, num_workers=4)
+
+	

@@ -9,7 +9,7 @@ import com.google.android.gms.maps.model.BitmapDescriptorFactory.*;
 
 public class Constants {
 
-    public static String BaseURL = "http://10.196.22.201:8000/";
+    public static String BaseURL = "http://192.168.1.104:8000/";
     public static String serverloc = BaseURL + "upload_image_and_get_results/";
     public static String save_entry_loc = BaseURL + "save_entry";
     public static String update_crops = BaseURL + "update_crops";
